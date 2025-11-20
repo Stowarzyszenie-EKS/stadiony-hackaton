@@ -1,7 +1,19 @@
-yourdomain.com {
-    reverse_proxy app-frontend:3000
+# Backend API
+api.example.com {
+    reverse_proxy backend:8080
+    log {
+            output file /var/log/caddy/backend_access.log
+            format single_field common_log
+        }
 }
 
-api.yourdomain.com {
-    reverse_proxy app-backend:8080
+# Frontend
+www.example.com {
+    reverse_proxy frontend:3000
+    encode gzip
+    file_server
+    log {
+            output file /var/log/caddy/frontend_access.log
+            format single_field common_log
+        }
 }

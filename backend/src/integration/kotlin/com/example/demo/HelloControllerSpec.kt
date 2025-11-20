@@ -3,7 +3,7 @@ package com.example.demo
 import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.web.client.TestRestTemplate
 
-class HelloIntegrationTest(
+class HelloControllerSpec(
     private val restTemplate: TestRestTemplate
 ) : BaseFunctionalSpec({
 

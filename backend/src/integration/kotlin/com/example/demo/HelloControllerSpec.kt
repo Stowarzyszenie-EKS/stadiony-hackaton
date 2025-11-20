@@ -10,6 +10,6 @@ class HelloControllerSpec(
     "GET /hello returns Hello World with full Spring context" {
         val response = restTemplate.getForEntity("/hello", String::class.java)
         response.statusCode.value() shouldBe 200
-        response.body!!.contains("Hello World") shouldBe true
+        response.body!!.contains("Hello world!") shouldBe true
     }
 })

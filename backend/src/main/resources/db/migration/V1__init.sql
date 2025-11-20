@@ -1,0 +1,5 @@
+CREATE TABLE chuj (
+    id SERIAL PRIMARY KEY,
+    dupa VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);

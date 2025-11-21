@@ -16,7 +16,6 @@ services:
     build: ../backend/scraper
     container_name: app-scraper
     restart: always
-    command: sh -c "while true; do node dist/scraper.js && sleep 3600; done"
     environment:
       NODE_ENV: production
     depends_on:

@@ -1,18 +1,16 @@
 version: "3.9"
 
 services:
-  # backend:
-  #   build: ../backend
-  #   container_name: app-backend
-  #   restart: always
-  #   environment:
-  #     SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/app
-  #     SPRING_DATASOURCE_USERNAME: app
-  #     SPRING_DATASOURCE_PASSWORD: app
-  #   expose:
-  #     - "8080"
-  #   depends_on:
-  #     - db
+  backend:
+    build: ../backend
+    container_name: app-backend
+    restart: always
+    environment:
+      NODE_ENV: production
+    expose:
+      - "8080"
+    depends_on:
+      - db
 
   # frontend:
   #   build: ../frontend

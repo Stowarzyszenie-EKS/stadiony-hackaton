@@ -1,3 +1,8 @@
+# HOW TO RUN
+```npm run scrape```
+
+output LLM:
+
 Jasne — poniżej **gotowy do skopiowania README.md** w całości, bez żadnych dopowiedzeń.
 
 ---

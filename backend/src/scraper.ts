@@ -79,12 +79,38 @@ async function scrapeTickets() {
             ...await page.evaluate(() => ({})), // Keep existing headers
             'Referer': BASE_URL
         });
-        let seatsRequests: Record<string, string> | null = null;
 
-        page.on("request", (request) => {
-            if (["xhr", "fetch"].includes(request.resourceType()) && request.url().includes("/GetWGLSeats")) {
-                console.log(request)
-                seatsRequests = request.headers();
+
+
+        let seats = null;
+
+        // Przechwytywanie response
+        page.on('response', async (response) => {
+            if (response.url().includes('/GetWGLSeats')) {
+                try {
+                    seats = await response.json(); // parsowanie JSON
+                    console.log('seats Body:', seats);
+                } catch (e) {
+                    // Jeśli nie jest JSON, pobierz tekst
+                    seats = await response.text();
+                    console.log('seats Text:', seats);
+                }
+            }
+        });
+
+        let stadion = null;
+
+        // Przechwytywanie response
+        page.on('response', async (response) => {
+            if (response.url().includes('/GetWGLSectorsInfo')) {
+                try {
+                    stadion = await response.json(); // parsowanie JSON
+                    console.log('stadion Body:', stadion);
+                } catch (e) {
+                    // Jeśli nie jest JSON, pobierz tekst
+                    stadion = await response.text();
+                    console.log('stadion Text:', stadion);
+                }
             }
         });
 
@@ -93,76 +119,6 @@ async function scrapeTickets() {
             waitUntil: 'networkidle2',
             timeout: 30000
         });
-
-        // Teraz seatsRequests powinno mieć prawidłowy request z nagłówkami, które generuje JS
-        if (seatsRequests == null) {
-            console.warn("⚠️ Nie wykryto requestu GetWGLSeats, sprawdź JS runtime strony");
-            throw new Error("❌ No GetWGLSeats requests captured");
-        }
-
-        const themeId = seatsRequests["x-theme-id"];
-        console.log(`✅ Captured X-Theme-Id: ${themeId}`);
-
-
-        console.log("✅ Stadium page loaded");
-
-        // Step 4: Get the full HTML
-
-        console.log(`✅ Scraping completed for eventId=${eventId}`);
-        console.log("=".repeat(80));
-
-        // ---------------------------
-        // Step 5: Fetch GetWGLSeats data
-        // ---------------------------
-        const seatsUrl = `${BASE_URL}/Stadium/GetWGLSeats?eventId=${eventId}`;
-        console.log(`🔗 Seats URL: ${seatsUrl}`);
-
-        // Zbierz cookies z Puppeteera (potrzebne do API)
-        const allCookies = await page.cookies();
-        const cookieHeader = allCookies.map(c => `${c.name}=${c.value}`).join("; ");
-
-        // Headers jak w prawdziwej przeglądarce + cookies
-        const seatsResponse = await fetch(seatsUrl, {
-            method: "POST",
-            headers: {
-                "accept": "application/json, text/plain, */*",
-                "accept-language": "en-US,en;q=0.9",
-                "content-length": "0",
-                "origin": "https://bilety.cracovia.pl",
-                "referer": stadiumUrl,
-                "sec-ch-ua": seatsRequests["sec-ch-ua"] || '',
-                "sec-ch-ua-mobile": seatsRequests["sec-ch-ua-mobile"] || '',
-                "sec-ch-ua-platform": seatsRequests["sec-ch-ua-platform"] || '',
-                "sec-fetch-dest": seatsRequests["sec-fetch-dest"] || '',
-                "sec-fetch-mode": seatsRequests["sec-fetch-mode"] || '',
-                "sec-fetch-site": seatsRequests["sec-fetch-site"] || '',
-                "user-agent": seatsRequests["user-agent"] || '',
-                "x-color-id": seatsRequests["x-color-id"] || '',
-                "x-requested-with": "XMLHttpRequest",
-                "x-theme-id": seatsRequests["x-theme-id"] || '',
-                "Cookie": cookieHeader
-            }
-        });
-
-
-
-        // Pobranie odpowiedzi jako tekst
-        console.log("seatsResponse:", seatsResponse);
-        const seatsRaw = await seatsResponse.text();
-        console.log("seatsRaw:", seatsRaw);
-
-        // Bezpieczne parsowanie JSON
-        let seatsJson: any = null;
-        try {
-            seatsJson = JSON.parse(seatsRaw);
-            console.log("✅ Seats JSON downloaded successfully");
-        } catch (err) {
-            console.error("❌ Failed to parse JSON from GetWGLSeats");
-            console.error(seatsRaw);
-        }
-
-        console.log("📊 Seats data:");
-        console.log(JSON.stringify(seatsJson, null, 2));
 
 
 

@@ -31,5 +31,5 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           script: |
             cd /home/ubuntu/stadiony-hackaton/infra
-            docker compose down
-            docker compose up -d --build
+            docker-compose down
+            docker-compose up -d --build

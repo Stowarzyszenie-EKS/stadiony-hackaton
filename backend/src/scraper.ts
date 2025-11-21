@@ -83,6 +83,7 @@ async function scrapeTickets() {
 
         page.on("request", (request) => {
             if (["xhr", "fetch"].includes(request.resourceType()) && request.url().includes("/GetWGLSeats")) {
+                console.log(request)
                 seatsRequests = request.headers();
             }
         });

@@ -3,7 +3,7 @@ import puppeteer from "puppeteer";
 const BASE_URL = "https://bilety.cracovia.pl";
 
 async function scrapeTickets() {
-    console.log("🚀 Starting Cracovia tickets scraper... ");
+    console.log("🚀 Starting Cracovia tickets scraper...");
 
     const browser = await puppeteer.launch({
         headless: true,

@@ -1,13 +1,16 @@
-FROM node:18 AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
+FROM node:18-alpine
 
-FROM node:18
 WORKDIR /app
+
+# Install serve globally
 RUN npm install -g serve
-COPY --from=build /app/build ./build
+
+# Copy static files
+COPY index.html .
+COPY script.js .
+
+# Expose port
 EXPOSE 3000
-CMD ["serve", "-s", "build", "-l", "3000"] ["serve", "-s", "build", "-l", "3000"]
+
+# Serve static files from current directory
+CMD ["serve", "-s", ".", "-l", "3000"]

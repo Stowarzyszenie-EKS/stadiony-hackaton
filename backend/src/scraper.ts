@@ -79,26 +79,79 @@ async function scrapeTickets() {
             ...await page.evaluate(() => ({})), // Keep existing headers
             'Referer': BASE_URL
         });
+        let seatsRequests: Record<string, string> | null = null;
+
+        page.on("request", (request) => {
+            if (["xhr", "fetch"].includes(request.resourceType()) && request.url().includes("/GetWGLSeats")) {
+                seatsRequests = request.headers();
+            }
+        });
+
 
         await page.goto(stadiumUrl, {
             waitUntil: 'networkidle2',
             timeout: 30000
         });
 
+        // Teraz seatsRequests powinno mieć prawidłowy request z nagłówkami, które generuje JS
+        if (seatsRequests == null) {
+            console.warn("⚠️ Nie wykryto requestu GetWGLSeats, sprawdź JS runtime strony");
+            throw new Error("❌ No GetWGLSeats requests captured");
+        }
+
+        const themeId = seatsRequests["x-theme-id"];
+        console.log(`✅ Captured X-Theme-Id: ${themeId}`);
+
+
         console.log("✅ Stadium page loaded");
 
         // Step 4: Get the full HTML
         const html = await page.content();
 
-        console.log("\n" + "=".repeat(80));
-        console.log(`📋 HTML Content of ${stadiumUrl}`);
-        console.log("=".repeat(80) + "\n");
-        console.log(html);
-        console.log("\n" + "=".repeat(80));
         console.log(`✅ Scraping completed for eventId=${eventId}`);
         console.log("=".repeat(80));
-        const cookies = await page.browser().cookies();
-        console.log(`cookies : ${cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ')}`);
+
+        // ---------------------------
+        // Step 5: Fetch GetWGLSeats data
+        // ---------------------------
+        const seatsUrl = `${BASE_URL}/Stadium/GetWGLSeats?eventId=${eventId}`;
+        console.log(`🔗 Seats URL: ${seatsUrl}`);
+
+        // Zbierz cookies z Puppeteera (potrzebne do API)
+        const allCookies = await page.cookies();
+        const cookieHeader = allCookies.map(c => `${c.name}=${c.value}`).join("; ");
+
+        // Headers jak w prawdziwej przeglądarce + cookies
+        const seatsResponse = await fetch(seatsUrl, {
+            method: "POST",
+            headers: {
+                "User-Agent":
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "application/json, text/javascript, */*; q=0.01",
+                "Referer": stadiumUrl,
+                "Cookie": cookieHeader,
+                "X-Theme-Id": themeId,
+            }
+        });
+
+        // Pobranie odpowiedzi jako tekst
+        const seatsRaw = await seatsResponse.text();
+        console.log("seatsRaw:", seatsRaw);
+
+        // Bezpieczne parsowanie JSON
+        let seatsJson: any = null;
+        try {
+            seatsJson = JSON.parse(seatsRaw);
+            console.log("✅ Seats JSON downloaded successfully");
+        } catch (err) {
+            console.error("❌ Failed to parse JSON from GetWGLSeats");
+            console.error(seatsRaw);
+        }
+
+        console.log("📊 Seats data:");
+        console.log(JSON.stringify(seatsJson, null, 2));
+
+
 
     } catch (error) {
         console.error("❌ Error during scraping:", error);
@@ -114,3 +167,13 @@ scrapeTickets().catch((error) => {
     console.error("Fatal error:", error);
     process.exit(1);
 });
+
+
+//event id
+// labelka klubu kotry przedaje bilety motor
+// total places albo capacity 
+// available places
+// sold places
+// sektor, narazie hard coded all
+// timestamp
+// wystaw api (location) => [rows]

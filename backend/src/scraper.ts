@@ -2,6 +2,20 @@ import puppeteer from "puppeteer";
 
 const BASE_URL = "https://bilety.cracovia.pl";
 
+interface Stadion {
+    sectors?: Sector[];
+}
+
+interface Sector {
+    seatsReservedFor: number;
+}
+
+
+interface Seats {
+    seats?: any[]
+}
+
+
 async function scrapeTickets() {
     console.log("🚀 Starting Cracovia tickets scraper...");
 
@@ -82,33 +96,30 @@ async function scrapeTickets() {
 
 
 
-        let seats = null;
+        let seats: Seats | undefined = undefined as Seats | undefined;
 
         // Przechwytywanie response
         page.on('response', async (response) => {
             if (response.url().includes('/GetWGLSeats')) {
                 try {
-                    seats = await response.json(); // parsowanie JSON
-                    console.log('seats Body:', seats);
+                    seats = await response.json() as Seats; // parsowanie JSON
                 } catch (e) {
                     // Jeśli nie jest JSON, pobierz tekst
-                    seats = await response.text();
                     console.log('seats Text:', seats);
                 }
             }
         });
 
-        let stadion = null;
+        let stadion: Stadion | undefined = undefined as Stadion | undefined;;
 
         // Przechwytywanie response
         page.on('response', async (response) => {
             if (response.url().includes('/GetWGLSectorsInfo')) {
                 try {
                     stadion = await response.json(); // parsowanie JSON
-                    console.log('stadion Body:', stadion);
                 } catch (e) {
                     // Jeśli nie jest JSON, pobierz tekst
-                    stadion = await response.text();
+                    stadion = await response.text() as Stadion;
                     console.log('stadion Text:', stadion);
                 }
             }
@@ -119,6 +130,13 @@ async function scrapeTickets() {
             waitUntil: 'networkidle2',
             timeout: 30000
         });
+
+        const seatsCount = seats?.seats?.length ?? 0;
+        const freeSeatsCount = (stadion?.['sectors'])?.map((s: any) => s.freeSeatsByPriceArea[0].freeSeatsNo).reduce((a: number, b: number) => a + b, 0) ?? 0;
+
+
+        console.log(`✅ Stadium page loaded, sectors info count: ${seatsCount}`);
+        console.log(`🎟️ Available seats: ${freeSeatsCount}`);
 
 
 

@@ -43,6 +43,8 @@ RUN npm ci --only=production
 # Copy built application from build stage
 COPY --from=build /app/dist ./dist
 
+RUN npm install
+
 # Expose port (if needed for future API)
 EXPOSE 8080
 

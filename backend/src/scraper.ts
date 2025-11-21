@@ -1,5 +1,72 @@
 import puppeteer from "puppeteer";
 
+
+
+import { Pool } from 'pg';
+
+const pool = new Pool({
+    user: 'app',
+    host: 'localhost',  // bo port wystawiony na Maca
+    database: 'app',
+    password: 'app',
+    port: 5432,
+});
+
+async function createTable() {
+    const client = await pool.connect();
+    try {
+        await client.query(`
+  CREATE TABLE IF NOT EXISTS stadium_seats (
+    id SERIAL PRIMARY KEY,
+    club_label TEXT,
+    total_places INT,
+    available_places INT,
+    sold_places INT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE(club_label, created_at)
+  );
+`);
+
+        console.log('✅ Table "stadium_seats" ensured!');
+    } catch (err) {
+        console.error('❌ Error creating table:', err);
+    } finally {
+        client.release();
+    }
+}
+
+
+interface StadiumData {
+    clubLabel: string;
+    totalPlaces: number;
+    availablePlaces: number;
+    soldPlaces: number;
+    timestamp: Date;
+}
+
+// Funkcja wstawiająca dane
+async function insertStadiumData(data: StadiumData) {
+    const client = await pool.connect();
+    try {
+        await client.query(
+            `INSERT INTO stadium_seats (
+                 club_label, total_places, available_places, sold_places, created_at
+            ) VALUES ($1, $2, $3, $4, $5)
+            ON CONFLICT DO NOTHING`,
+            [
+                data.clubLabel,
+                data.totalPlaces,
+                data.availablePlaces,
+                data.soldPlaces,
+                data.timestamp
+            ]
+        );
+    } finally {
+        client.release();
+    }
+}
+
+
 const BASE_URL = "https://bilety.cracovia.pl";
 
 interface Stadion {
@@ -133,12 +200,22 @@ async function scrapeTickets() {
 
         const seatsCount = seats?.seats?.length ?? 0;
         const freeSeatsCount = (stadion?.['sectors'])?.map((s: any) => s.freeSeatsByPriceArea[0].freeSeatsNo).reduce((a: number, b: number) => a + b, 0) ?? 0;
-
+        const soldSeatsCount = seatsCount - freeSeatsCount;
 
         console.log(`✅ Stadium page loaded, sectors info count: ${seatsCount}`);
         console.log(`🎟️ Available seats: ${freeSeatsCount}`);
 
 
+        const stadiumData: StadiumData = {
+            clubLabel: "Motor",   // lub pobierz dynamicznie jeśli możesz
+            totalPlaces: seatsCount,
+            availablePlaces: freeSeatsCount,
+            soldPlaces: soldSeatsCount,
+            timestamp: new Date()
+        };
+
+        console.log("💾 Inserting data into database...", stadiumData);
+        await insertStadiumData(stadiumData);
 
     } catch (error) {
         console.error("❌ Error during scraping:", error);
@@ -149,11 +226,23 @@ async function scrapeTickets() {
     }
 }
 
-// Run the scraper
-scrapeTickets().catch((error) => {
-    console.error("Fatal error:", error);
-    process.exit(1);
+createTable().catch(console.error).then(() => {
+
+    scrapeTickets().catch((error) => {
+        console.error("Fatal error:", error);
+        process.exit(1);
+    });
+
+    // Powtarzaj co 10 minut (600 000 ms)
+    setInterval(() => {
+        scrapeTickets().catch((error) => {
+            console.error("Fatal error:", error);
+            process.exit(1);
+        })
+    }, 10 * 60 * 1000);
 });
+
+// Run the scraper
 
 
 //event id

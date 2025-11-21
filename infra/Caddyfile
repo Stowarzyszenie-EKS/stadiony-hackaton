@@ -1,19 +1,20 @@
-# Backend API
-api.example.com {
-    reverse_proxy backend:8080
-    log {
+hackaton.sympozjon.org {
+    # Backend API - wszystkie requesty zaczynające się od /api
+    handle /api/* {
+        reverse_proxy app-backend:8080
+        log {
             output file /var/log/caddy/backend_access.log
             format single_field common_log
         }
-}
+    }
 
-# Frontend
-www.example.com {
-    reverse_proxy frontend:3000
-    encode gzip
-    file_server
-    log {
+    # Frontend - wszystko inne
+    handle {
+        reverse_proxy app-frontend:3000
+        encode gzip
+        log {
             output file /var/log/caddy/frontend_access.log
             format single_field common_log
         }
+    }
 }

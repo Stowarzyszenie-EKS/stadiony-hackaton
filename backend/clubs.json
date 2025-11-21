@@ -1,0 +1,29 @@
+{
+    "ekstraklasa": {
+        "clubs": {
+            "arka": "bilety.arka.gdynia.pl",  
+            "termalica": "bilety.brukbet.com",  
+            "cracovia": "bilety.cracovia.pl",  
+            "gieksa": "bilety.gkskatowice.eu",  
+            "torcida": "bilety.gornikzabrze.pl",  
+            "jaga": "bilety.jagiellonia.pl",  
+            "korona": "bilety.korona-kielce.pl",  
+            "kolejorz": "bilety.lechpoznan.pl",  
+            "lechia": "bilety.lechia.pl",  
+            "legia": "bilety.legia.com",  
+            "motor": "bilety.motorlublin.eu",  
+            "gliwice": "bilety.piast-gliwice.eu",  
+            "portowcy": "bilety.pogonszczecin.pl",  
+            "radomiak": "bilety.rksradomiak.pl",  
+            "medaliki": "bilety.rakow.com", 
+            "widzew": "bilety.widzew.com",  
+            "nafciarze": "bilety.wisla-plock.pl",
+            "miedziowi": "bilety.zaglebie.com" ,
+            "wiselka" : "bilety.wislakrakow.com"
+        }
+            
+    },
+        "1_liga": {
+        "nazwa": ""
+    }
+}

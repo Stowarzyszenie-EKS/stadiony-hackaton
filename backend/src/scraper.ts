@@ -97,6 +97,8 @@ async function scrapeTickets() {
         console.log("\n" + "=".repeat(80));
         console.log(`✅ Scraping completed for eventId=${eventId}`);
         console.log("=".repeat(80));
+        const cookies = await page.browser().cookies();
+        console.log(`cookies : ${cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ')}`);
 
     } catch (error) {
         console.error("❌ Error during scraping:", error);

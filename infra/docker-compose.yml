@@ -6,9 +6,7 @@ services:
     container_name: app-backend
     restart: always
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/app
-      SPRING_DATASOURCE_USERNAME: app
-      SPRING_DATASOURCE_PASSWORD: app
+      NODE_ENV: production
     expose:
       - "8080"
     depends_on:
@@ -18,8 +16,8 @@ services:
     build: ../frontend
     container_name: app-frontend
     restart: always
-    expose:
-      - "3000"
+    ports:
+      - "3000:3000"
 
   db:
     image: postgres:15
@@ -31,6 +29,8 @@ services:
       POSTGRES_PASSWORD: app
     volumes:
       - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
   reverse-proxy:
     image: caddy:latest

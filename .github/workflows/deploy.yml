@@ -20,7 +20,8 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_KEY }}
           source: "./"
-          target: "/app"
+          target: "/home/ubuntu/stadiony-hackaton"
+          debug: true
 
       - name: Run docker compose on server via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -29,6 +30,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_KEY }}
           script: |
-            cd /app/infrastructure
-            docker compose down
-            docker compose up -d --build
+            cd /home/ubuntu/stadiony-hackaton/infra
+            docker-compose down
+            docker-compose up -d --build

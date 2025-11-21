@@ -16,7 +16,7 @@ Backend przygotowany na potrzeby hackathonu. Projekt oparty o **Node.js**, **Typ
 
 ## 📁 Struktura projektu
 
-```
+```plaintext
 
 .
 ├── src/

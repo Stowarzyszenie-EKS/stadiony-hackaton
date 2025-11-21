@@ -1,25 +1,25 @@
 version: "3.9"
 
 services:
-  backend:
-    build: ../backend
-    container_name: app-backend
-    restart: always
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/app
-      SPRING_DATASOURCE_USERNAME: app
-      SPRING_DATASOURCE_PASSWORD: app
-    expose:
-      - "8080"
-    depends_on:
-      - db
+  # backend:
+  #   build: ../backend
+  #   container_name: app-backend
+  #   restart: always
+  #   environment:
+  #     SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/app
+  #     SPRING_DATASOURCE_USERNAME: app
+  #     SPRING_DATASOURCE_PASSWORD: app
+  #   expose:
+  #     - "8080"
+  #   depends_on:
+  #     - db
 
-  frontend:
-    build: ../frontend
-    container_name: app-frontend
-    restart: always
-    expose:
-      - "3000"
+  # frontend:
+  #   build: ../frontend
+  #   container_name: app-frontend
+  #   restart: always
+  #   expose:
+  #     - "3000"
 
   db:
     image: postgres:15
@@ -32,20 +32,20 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
 
-  reverse-proxy:
-    image: caddy:latest
-    container_name: caddy-proxy
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      - backend
-      - frontend
+  # reverse-proxy:
+  #   image: caddy:latest
+  #   container_name: caddy-proxy
+  #   restart: always
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./Caddyfile:/etc/caddy/Caddyfile
+  #     - caddy_data:/data
+  #     - caddy_config:/config
+  #   depends_on:
+  #     - backend
+  #     - frontend
 
 volumes:
   db_data:

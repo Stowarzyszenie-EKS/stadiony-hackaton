@@ -16,14 +16,19 @@ async function createTable() {
     const client = await pool.connect();
     try {
         await client.query(`
-  CREATE TABLE IF NOT EXISTS stadium_seats (
+  DROP TABLE IF EXISTS stadium_seats;
+
+`)
+        await client.query(`
+  CREATE TABLE IF NOT EXISTS  stadium_seats (
     id SERIAL PRIMARY KEY,
+    event_id TEXT,
     club_label TEXT,
     total_places INT,
     available_places INT,
     sold_places INT,
     created_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE(club_label, created_at)
+    UNIQUE(event_id, created_at)
   );
 `);
 
@@ -37,6 +42,7 @@ async function createTable() {
 
 
 interface StadiumData {
+    eventId: string;
     clubLabel: string;
     totalPlaces: number;
     availablePlaces: number;
@@ -50,10 +56,11 @@ async function insertStadiumData(data: StadiumData) {
     try {
         await client.query(
             `INSERT INTO stadium_seats (
-                 club_label, total_places, available_places, sold_places, created_at
-            ) VALUES ($1, $2, $3, $4, $5)
+                 event_id, club_label, total_places, available_places, sold_places, created_at
+            ) VALUES ($1, $2, $3, $4, $5, $6)
             ON CONFLICT DO NOTHING`,
             [
+                data.eventId,
                 data.clubLabel,
                 data.totalPlaces,
                 data.availablePlaces,
@@ -207,6 +214,7 @@ async function scrapeTickets() {
 
 
         const stadiumData: StadiumData = {
+            eventId: eventId,
             clubLabel: "Motor",   // lub pobierz dynamicznie jeśli możesz
             totalPlaces: seatsCount,
             availablePlaces: freeSeatsCount,

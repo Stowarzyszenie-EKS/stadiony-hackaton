@@ -106,7 +106,6 @@ async function scrapeTickets() {
         console.log("✅ Stadium page loaded");
 
         // Step 4: Get the full HTML
-        const html = await page.content();
 
         console.log(`✅ Scraping completed for eventId=${eventId}`);
         console.log("=".repeat(80));
@@ -125,16 +124,29 @@ async function scrapeTickets() {
         const seatsResponse = await fetch(seatsUrl, {
             method: "POST",
             headers: {
-                "User-Agent":
-                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Accept": "application/json, text/javascript, */*; q=0.01",
-                "Referer": stadiumUrl,
-                "Cookie": cookieHeader,
-                "X-Theme-Id": themeId,
+                "accept": "application/json, text/plain, */*",
+                "accept-language": "en-US,en;q=0.9",
+                "content-length": "0",
+                "origin": "https://bilety.cracovia.pl",
+                "referer": stadiumUrl,
+                "sec-ch-ua": seatsRequests["sec-ch-ua"] || '',
+                "sec-ch-ua-mobile": seatsRequests["sec-ch-ua-mobile"] || '',
+                "sec-ch-ua-platform": seatsRequests["sec-ch-ua-platform"] || '',
+                "sec-fetch-dest": seatsRequests["sec-fetch-dest"] || '',
+                "sec-fetch-mode": seatsRequests["sec-fetch-mode"] || '',
+                "sec-fetch-site": seatsRequests["sec-fetch-site"] || '',
+                "user-agent": seatsRequests["user-agent"] || '',
+                "x-color-id": seatsRequests["x-color-id"] || '',
+                "x-requested-with": "XMLHttpRequest",
+                "x-theme-id": seatsRequests["x-theme-id"] || '',
+                "Cookie": cookieHeader
             }
         });
 
+
+
         // Pobranie odpowiedzi jako tekst
+        console.log("seatsResponse:", seatsResponse);
         const seatsRaw = await seatsResponse.text();
         console.log("seatsRaw:", seatsRaw);
 

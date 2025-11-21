@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "ts-node src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "scrape": "ts-node src/scraper.ts"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
@@ -17,6 +18,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "axios": "^1.13.2"
+    "axios": "^1.13.2",
+    "puppeteer": "^23.11.1"
   }
 }

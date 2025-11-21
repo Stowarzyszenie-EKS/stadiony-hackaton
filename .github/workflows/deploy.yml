@@ -20,7 +20,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_KEY }}
           source: "./"
-          target: "/stadiony-hackaton"
+          target: "/home/ubuntu/stadiony-hackaton"
           debug: true
 
       - name: Run docker compose on server via SSH
@@ -30,6 +30,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_KEY }}
           script: |
-            cd /stadiony-hackaton/infrastructure
+            cd /home/ubuntu/stadiony-hackaton/infrastructure
             docker compose down
             docker compose up -d --build

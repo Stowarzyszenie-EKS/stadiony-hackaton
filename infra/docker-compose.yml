@@ -12,12 +12,12 @@ services:
     depends_on:
       - db
 
-  # frontend:
-  #   build: ../frontend
-  #   container_name: app-frontend
-  #   restart: always
-  #   expose:
-  #     - "3000"
+  frontend:
+    build: ../frontend
+    container_name: app-frontend
+    restart: always
+    ports:
+      - "3000:3000"
 
   db:
     image: postgres:15

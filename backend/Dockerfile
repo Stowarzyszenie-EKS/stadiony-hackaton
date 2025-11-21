@@ -32,21 +32,27 @@ RUN apk add --no-cache \
     ca-certificates \
     ttf-freefont
 
-# Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
+# Install ts-node globally
+RUN npm install -g ts-node typescript
+
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 # Copy package files
 COPY package*.json ./
+COPY tsconfig.json ./
 
 # Install production dependencies only
 RUN npm ci --only=production
 
-# Copy built application from build stage
+# Copy built application (or TypeScript if running with ts-node)
 COPY --from=build /app/dist ./dist
+COPY src ./src
 
-# Expose port (if needed for future API)
 EXPOSE 8080
 
-# Run the scraper
+# If scraper is TypeScript:
+# CMD ["ts-node", "src/scrape.ts"]
+
+# If scraper uses dist:
 CMD ["npm", "run", "scrape"]

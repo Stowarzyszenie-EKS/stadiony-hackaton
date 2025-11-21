@@ -13,8 +13,6 @@ RUN npm ci
 # Copy source code
 COPY src ./src
 
-RUN npm install
-
 # Build TypeScript
 RUN npm run build
 
@@ -32,7 +30,7 @@ RUN apk add --no-cache \
     ca-certificates \
     ttf-freefont
 
-# Install ts-node globally
+# Install ts-node globally for running TypeScript directly
 RUN npm install -g ts-node typescript
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
@@ -42,17 +40,14 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install production dependencies only
+# Install production dependencies
 RUN npm ci --only=production
 
-# Copy built application (or TypeScript if running with ts-node)
+# Copy built application
 COPY --from=build /app/dist ./dist
+
+# Copy source for ts-node fallback
 COPY src ./src
 
-EXPOSE 8080
-
-# If scraper is TypeScript:
-# CMD ["ts-node", "src/scrape.ts"]
-
-# If scraper uses dist:
-CMD ["npm", "run", "scrape"]
+# Run the scraper
+CMD ["node", "dist/scraper.js"]

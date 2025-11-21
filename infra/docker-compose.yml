@@ -1,14 +1,24 @@
 version: "3.9"
 
 services:
-  backend:
-    build: ../backend
-    container_name: app-backend
+  api:
+    build: ../backend/api
+    container_name: app-api
     restart: always
     environment:
       NODE_ENV: production
     expose:
       - "8080"
+    depends_on:
+      - db
+
+  scraper:
+    build: ../backend/scraper
+    container_name: app-scraper
+    restart: always
+    command: sh -c "while true; do node dist/scraper.js && sleep 3600; done"
+    environment:
+      NODE_ENV: production
     depends_on:
       - db
 
@@ -42,7 +52,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
-      - backend
+      - api
       - frontend
 
 volumes:

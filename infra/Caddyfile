@@ -1,7 +1,7 @@
 hakaton.sympozjon.org {
     # Backend API - wszystkie requesty zaczynające się od /api
     handle /api/* {
-        reverse_proxy app-backend:8080
+        reverse_proxy app-api:8080
 #        log {
 #            output file /var/log/caddy/backend_access.log
 #            format single_field common_log

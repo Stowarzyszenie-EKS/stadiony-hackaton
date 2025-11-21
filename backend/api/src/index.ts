@@ -1,14 +1,6 @@
-import axios from "axios";
 import express from "express";
 import { Client } from "pg";
 
-
-async function main() {
-    const res = await axios.get("https://api.github.com");
-    console.log("Dane:", res.data);
-}
-
-main().catch(console.error);
 
 const app = express();
 

@@ -1,4 +1,4 @@
-hackaton.sympozjon.org {
+hakaton.sympozjon.org {
     # Backend API - wszystkie requesty zaczynające się od /api
     handle /api/* {
         reverse_proxy app-backend:8080

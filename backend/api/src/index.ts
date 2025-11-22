@@ -24,7 +24,7 @@ app.get("/api/:clubName/", async (req, res) => {
         await client.connect();
         const latestEventResult = await client.query(
             `SELECT event_id
-             FROM events
+             FROM stadium_seats
              WHERE club_label = $1
              ORDER BY created_at DESC LIMIT 1`,
             [clubName]
@@ -37,7 +37,7 @@ app.get("/api/:clubName/", async (req, res) => {
 
         const result = await client.query(
             `SELECT created_at, capacity, available_places
-             FROM events
+             FROM stadium_seats
              WHERE club_label = $1
                AND event_id = $2
              ORDER BY created_at DESC`,

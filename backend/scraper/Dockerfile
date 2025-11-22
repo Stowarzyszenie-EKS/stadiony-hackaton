@@ -1,53 +1,63 @@
 # Stage 1: Build
-FROM node:18-alpine AS build
+FROM node:18-slim AS build
 
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install dependencies
 RUN npm install
 
-# Copy source code
 COPY src ./src
 
-# Build TypeScript
 RUN npm run build
 
 # Stage 2: Production
-FROM node:18-alpine
+FROM node:18-slim
 
 WORKDIR /app
 
-# Install Chromium dependencies for Puppeteer
-RUN apk add --no-cache \
+# Install Chromium & dependencies for Puppeteer
+RUN apt-get update && apt-get install -y \
     chromium \
-    nss \
-    freetype \
-    harfbuzz \
+    wget \
     ca-certificates \
-    ttf-freefont
+    fonts-liberation \
+    libasound2 \
+    libatk1.0-0 \
+    libc6 \
+    libcairo2 \
+    libcups2 \
+    libdbus-1-3 \
+    libexpat1 \
+    libfontconfig1 \
+    libgbm1 \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libpango1.0-0 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxrandr2 \
+    libxrender1 \
+    libxss1 \
+    libxtst6 \
+    xdg-utils \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install ts-node globally for running TypeScript directly
-RUN npm install -g ts-node typescript
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-
-# Copy package files
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install production dependencies
 RUN npm install --only=production
 
-# Copy built application
 COPY --from=build /app/dist ./dist
 
-# Copy source for ts-node fallback
-COPY src ./src
-
-# Run the scraper
 CMD ["node", "dist/scraper.js"]

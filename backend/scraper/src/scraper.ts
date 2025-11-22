@@ -174,6 +174,7 @@ async function scrapeTickets() {
 
         // Przechwytywanie response
         page.on('response', async (response) => {
+            console.log("🌐 Response:", response.url(), response.status());
             if (response.url().includes('/GetWGLSeats')) {
                 try {
                     seats = await response.json() as Seats; // parsowanie JSON

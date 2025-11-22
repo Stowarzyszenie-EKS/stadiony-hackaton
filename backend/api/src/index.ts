@@ -56,7 +56,7 @@ app.get("/api/:clubName/", async (req, res) => {
     }
 });
 
-app.get('/api/ENDPOINT_SUPER_GREAT', (req, res) => {
+app.get('/api/test/ENDPOINT_SUPER_GREAT', (req, res) => {
     res.json({
         totalSeats: stadiumData.totalSeats,
         occupiedSeats: stadiumData.occupiedSeats,

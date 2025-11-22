@@ -1,0 +1,8 @@
+{
+    "clubName": "Cracovia",
+    "colors": ["white", "red", "black"],
+    "attendance": {
+        "current": 10503,
+        "max": 15000
+    }
+}

@@ -6,7 +6,7 @@ import { Pool } from 'pg';
 
 const pool = new Pool({
     user: 'app',
-    host: 'localhost',  // bo port wystawiony na Maca
+    host: 'db',  // bo port wystawiony na Maca
     database: 'app',
     password: 'app',
     port: 5432,

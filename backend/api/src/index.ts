@@ -1,8 +1,16 @@
 import express from "express";
 import { Client } from "pg";
 
-
 const app = express();
+const PORT = 8080;
+
+// Mock data
+const stadiumData = {
+    totalSeats: 50000,
+    occupiedSeats: 32000,
+    freeSeats: 18000,
+    clubName: "FC Super Club"
+};
 
 app.get("/seats/:clubName/:eventId", async (req, res) => {
     const { clubName, eventId } = req.params;
@@ -34,6 +42,15 @@ app.get("/seats/:clubName/:eventId", async (req, res) => {
     }
 });
 
-app.listen(8080, () => {
-    console.log("Server running on port 8080");
+app.get('/api/ENDPOINT_SUPER_GREAT', (req, res) => {
+    res.json({
+        totalSeats: stadiumData.totalSeats,
+        occupiedSeats: stadiumData.occupiedSeats,
+        freeSeats: stadiumData.freeSeats,
+        clubName: stadiumData.clubName
+    });
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });

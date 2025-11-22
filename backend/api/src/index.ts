@@ -12,7 +12,7 @@ const stadiumData = {
     clubName: "FCSuperClub"
 };
 
-app.get("/seats/:clubName/", async (req, res) => {
+app.get("/api/:clubName/", async (req, res) => {
     const {clubName} = req.params;
     const client = new Client({
         host: "app-db",
@@ -25,8 +25,8 @@ app.get("/seats/:clubName/", async (req, res) => {
         const latestEventResult = await client.query(
             `SELECT event_id
              FROM events
-             WHERE club_name = $1
-             ORDER BY timestamp DESC LIMIT 1`,
+             WHERE club_label = $1
+             ORDER BY created_at DESC LIMIT 1`,
             [clubName]
         );
         if (latestEventResult.rows.length === 0) {
@@ -36,11 +36,11 @@ app.get("/seats/:clubName/", async (req, res) => {
         const eventId = latestEventResult.rows[0].event_id;
 
         const result = await client.query(
-            `SELECT timestamp, capacity, available_places
+            `SELECT created_at, capacity, available_places
              FROM events
-             WHERE club_name = $1
+             WHERE club_label = $1
                AND event_id = $2
-             ORDER BY timestamp DESC`,
+             ORDER BY created_at DESC`,
             [clubName, eventId]
         );
         if (result.rows.length === 0) {

@@ -9,7 +9,7 @@ const stadiumData = {
     totalSeats: 50000,
     occupiedSeats: 32000,
     freeSeats: 18000,
-    clubName: "FC Super Club"
+    clubName: "FCSuperClub"
 };
 
 app.get("/seats/:clubName/:eventId", async (req, res) => {

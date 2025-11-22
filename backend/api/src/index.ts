@@ -36,7 +36,7 @@ app.get("/api/:clubName/", async (req, res) => {
         const eventId = latestEventResult.rows[0].event_id;
 
         const result = await client.query(
-            `SELECT created_at, capacity, available_places
+            `SELECT created_at, total_places, available_places
              FROM stadium_seats
              WHERE club_label = $1
                AND event_id = $2

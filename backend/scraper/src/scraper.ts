@@ -1,7 +1,6 @@
 import puppeteer from "puppeteer";
-
-
-
+import * as fs from 'fs';
+import * as path from 'path';
 import { Pool } from 'pg';
 
 const pool = new Pool({
@@ -73,8 +72,19 @@ async function insertStadiumData(data: StadiumData) {
     }
 }
 
+interface ClubsConfig {
+    ekstraklasa: {
+        clubs: {
+            [key: string]: string;
+        }
+    }
+}
 
-const BASE_URL = "https://bilety.cracovia.pl";
+function loadClubsConfig(): ClubsConfig {
+    const clubsPath = path.join(__dirname, '../../clubs.json');
+    const clubsData = fs.readFileSync(clubsPath, 'utf-8');
+    return JSON.parse(clubsData);
+}
 
 interface Stadion {
     sectors?: Sector[];
@@ -90,8 +100,8 @@ interface Seats {
 }
 
 
-async function scrapeTickets() {
-    console.log("🚀 Starting Cracovia tickets scraper...");
+async function scrapeTickets(clubLabel: string, baseUrl: string) {
+    console.log(`🚀 Starting ${clubLabel} tickets scraper...`);
 
     const browser = await puppeteer.launch({
         headless: true,
@@ -128,8 +138,8 @@ async function scrapeTickets() {
         });
 
         // Step 1: Navigate to the main page
-        console.log(`📄 Navigating to ${BASE_URL}...`);
-        await page.goto(BASE_URL, {
+        console.log(`📄 Navigating to ${baseUrl}...`);
+        await page.goto(baseUrl, {
             waitUntil: 'networkidle2',
             timeout: 30000
         });
@@ -159,13 +169,13 @@ async function scrapeTickets() {
         console.log(`   Link: ${firstEventLink}`);
 
         // Step 3: Navigate to the stadium page
-        const stadiumUrl = `${BASE_URL}${firstEventLink}`;
+        const stadiumUrl = `${baseUrl}${firstEventLink}`;
         console.log(`\n📄 Navigating to stadium page: ${stadiumUrl}...`);
 
         // Set referer to the main page
         await page.setExtraHTTPHeaders({
             ...await page.evaluate(() => ({})), // Keep existing headers
-            'Referer': BASE_URL
+            'Referer': baseUrl
         });
 
 
@@ -216,7 +226,7 @@ async function scrapeTickets() {
 
         const stadiumData: StadiumData = {
             eventId: eventId,
-            clubLabel: "Motor",   // lub pobierz dynamicznie jeśli możesz
+            clubLabel: clubLabel,
             totalPlaces: seatsCount,
             availablePlaces: freeSeatsCount,
             soldPlaces: soldSeatsCount,
@@ -235,21 +245,48 @@ async function scrapeTickets() {
     }
 }
 
-createTable().catch(console.error).then(() => {
+async function scrapeAllClubs() {
+    const config = loadClubsConfig();
+    const clubs = config.ekstraklasa.clubs;
 
-    scrapeTickets().catch((error) => {
-        console.error("Fatal error:", error);
+    console.log(`📋 Found ${Object.keys(clubs).length} clubs to scrape`);
+
+    for (const [clubLabel, baseUrl] of Object.entries(clubs)) {
+        try {
+            console.log(`\n${'='.repeat(60)}`);
+            console.log(`🏟️  Processing club: ${clubLabel}`);
+            console.log(`🔗 URL: ${baseUrl}`);
+            console.log(`${'='.repeat(60)}\n`);
+
+            await scrapeTickets(clubLabel, baseUrl);
+
+            console.log(`✅ Successfully scraped ${clubLabel}`);
+
+            // Opcjonalne: krótkie opóźnienie między klubami
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+        } catch (error) {
+            console.error(`❌ Error scraping ${clubLabel}:`, error);
+            // Kontynuuj z następnym klubem mimo błędu
+            continue;
+        }
+    }
+
+    console.log(`\n${'='.repeat(60)}`);
+    console.log(`🏁 Finished scraping all clubs`);
+    console.log(`${'='.repeat(60)}`);
+}
+
+createTable()
+    .then(() => scrapeAllClubs())
+    .then(() => {
+        console.log("✅ All scraping completed successfully");
+        process.exit(0);
+    })
+    .catch((error) => {
+        console.error("❌ Fatal error:", error);
         process.exit(1);
     });
-
-    // Powtarzaj co 10 minut (600 000 ms)
-    setInterval(() => {
-        scrapeTickets().catch((error) => {
-            console.error("Fatal error:", error);
-            process.exit(1);
-        })
-    }, 10 * 60 * 1000);
-});
 
 // Run the scraper
 

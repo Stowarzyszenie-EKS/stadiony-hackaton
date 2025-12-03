@@ -9,7 +9,7 @@ COPY tsconfig.json ./
 RUN npm install
 
 COPY src ./src
-COPY ../clubs.json ./
+COPY clubs.json ./
 
 RUN npm run build
 

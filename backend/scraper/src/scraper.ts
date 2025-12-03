@@ -15,10 +15,6 @@ async function createTable() {
     const client = await pool.connect();
     try {
         await client.query(`
-  DROP TABLE IF EXISTS stadium_seats;
-
-`)
-        await client.query(`
   CREATE TABLE IF NOT EXISTS  stadium_seats (
     id SERIAL PRIMARY KEY,
     event_id TEXT,

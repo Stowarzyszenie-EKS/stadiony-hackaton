@@ -40,13 +40,14 @@ app.get("/api/:clubName/", async (req, res) => {
              FROM stadium_seats
              WHERE club_label = $1
                AND event_id = $2
-             ORDER BY created_at DESC`,
+             ORDER BY created_at DESC
+             LIMIT 1`,
             [clubName, eventId]
         );
         if (result.rows.length === 0) {
             res.status(404).json({error: "Event not found"});
         } else {
-            res.status(200).json(result.rows);
+            res.status(200).json(result.rows[0]);
         }
     } catch (err) {
         const errorMessage = err instanceof Error ? err.message : String(err);

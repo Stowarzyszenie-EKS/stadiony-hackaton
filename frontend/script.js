@@ -107,11 +107,12 @@ async function loadSeats(clubId) {
         const url = `${API_URL}/${clubId}`;
 
         const response = await fetch(url);
-        const json = await response.json();
+        const data = await response.json();
 
-        const sold = json.sold;
-        const total = json.total;
-        const free = total - sold;
+        // API zwraca pojedynczy obiekt z najnowszym datapointem
+        const total = data.total_places;
+        const free = data.available_places;
+        const sold = total - free;
 
         freeSeatsBox.innerText = free;
         soldTotalInfo.innerText = `${sold} / ${total}`;
@@ -120,8 +121,8 @@ async function loadSeats(clubId) {
         console.warn("API niedostępne — używam mocka.");
 
         const mock = {
-            krakowia: { sold: 1200, total: 8000 },
-            nassarze: { sold: 2200, total: 10000 },
+            cracovia: { sold: 1200, total: 8000 },
+            portowcy: { sold: 2200, total: 10000 },
             kolejorz: { sold: 4200, total: 4200 }
         };
 
@@ -136,4 +137,4 @@ async function loadSeats(clubId) {
 // START – ustaw pierwszy klub
 // ------------------------------------------
 
-setActiveClub("krakowia");
+setActiveClub("cracovia");

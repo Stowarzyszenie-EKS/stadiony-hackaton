@@ -8,6 +8,7 @@ RUN npm install -g serve
 # Copy static files
 COPY index.html .
 COPY script.js .
+COPY style.css .
 
 # Expose port
 EXPOSE 3000

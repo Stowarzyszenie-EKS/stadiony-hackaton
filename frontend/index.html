@@ -2,20 +2,51 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
+    <title>Kluby — Dashboard Stadionu</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frekwencja na meczach Ekstraklasy</title>
-    <script defer src="script.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="stripes">
-        <div class="stripe red"></div>
-        <div class="stripe white"></div>
-        <div class="stripe black"></div>
+
+<div id="app">
+
+    <!-- Ukośne pasy -->
+    <div class="diagonal-left">
+        <div class="diagonal-inner" id="leftStripes"></div>
     </div>
-    <div id="counterContainer">
-        <h1>Frekwencja na meczach Ekstraklasy</h1>
-        <div id="counter">10503 / 15000</div>
+
+    <div class="diagonal-right">
+        <div class="diagonal-inner" id="rightStripes"></div>
     </div>
+
+    <div class="container">
+
+        <!-- Pasek z przełącznikami klubów -->
+        <div class="club-switcher" id="clubSwitcher"></div>
+
+        <!-- Centralna część -->
+        <div class="top-center">
+
+            <!-- Nazwa klubu + herb -->
+            <div class="header-row">
+                <div class="club-name-box" id="clubNameBox">NAZWA KLUBU</div>
+                <div class="hex-badge" id="clubBadge"></div>
+            </div>
+
+            <!-- Wolne miejsca -->
+            <div class="seats-box">
+                <div class="seats-title">WOLNYCH MIEJSC</div>
+                <div class="seats-number" id="freeSeats">—</div>
+                <div class="seats-meta">
+                    <div>🏟️</div>
+                    <div id="soldTotalInfo">— / —</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>

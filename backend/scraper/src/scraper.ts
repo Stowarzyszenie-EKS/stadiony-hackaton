@@ -81,7 +81,8 @@ interface ClubsConfig {
 }
 
 function loadClubsConfig(): ClubsConfig {
-    const clubsPath = path.join(__dirname, '../../clubs.json');
+    // W kontenerze Docker plik clubs.json jest w /app/clubs.json
+    const clubsPath = path.join(__dirname, '../clubs.json');
     const clubsData = fs.readFileSync(clubsPath, 'utf-8');
     return JSON.parse(clubsData);
 }

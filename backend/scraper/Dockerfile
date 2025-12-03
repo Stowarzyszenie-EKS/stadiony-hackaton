@@ -9,6 +9,7 @@ COPY tsconfig.json ./
 RUN npm install
 
 COPY src ./src
+COPY ../clubs.json ./
 
 RUN npm run build
 
@@ -59,5 +60,6 @@ COPY tsconfig.json ./
 RUN npm install --only=production
 
 COPY --from=build /app/dist ./dist
+COPY --from=build /app/clubs.json ./
 
 CMD ["node", "dist/scraper.js"]
